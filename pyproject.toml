@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "platonus-qr-desktop"
+version = "1.1.0"
+description = "Desktop client for Platonus attendance QR codes"
+readme = "README.md"
+requires-python = ">=3.11"
+dynamic = ["dependencies"]
+
+[project.scripts]
+platonus-qr-desktop = "platonus_desktop.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["platonus_desktop*"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.setuptools.package-data]
+platonus_desktop = ["static/*", "locales/*.json"]

@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Platonus QR Desktop</title>
+  <link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/app.css">
+  <script src="/assets/strings.js" defer></script>
+  <script src="/assets/map.js" defer></script>
+  <script src="/assets/app.js" defer></script>
+</head>
+<body data-host-language="{{HOST_LANGUAGE}}">
+  <header class="site-header">
+    <div class="shell header-inner">
+      <span class="brand">
+        <img src="/assets/mark.svg" alt="" width="26" height="26">
+        <span>Platonus QR Desktop</span>
+      </span>
+      <div class="language" role="group" aria-label="Language" data-label="language">
+        <button type="button" data-language="ru" lang="ru" aria-pressed="false">RU</button>
+        <button type="button" data-language="en" lang="en" aria-pressed="false">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell content">
+    <section id="access-section" aria-labelledby="access-title" hidden>
+      <h1 id="access-title" data-text="accessTitle">Open your local session</h1>
+      <p class="intro" data-text="accessHelp">Enter the access key shown in your terminal.</p>
+      <form id="access-form" class="form">
+        <label for="access-key" data-text="accessKey">Access key</label>
+        <input id="access-key" type="password" autocomplete="off" required minlength="32" maxlength="128">
+        <button class="button primary" type="submit" data-text="unlock">Continue</button>
+      </form>
+    </section>
+
+    <section id="login-section" aria-labelledby="login-title" hidden>
+      <h1 id="login-title" data-text="loginTitle">Sign in to Platonus</h1>
+      <p class="intro" data-text="loginHelp">Use the account and Platonus address provided by your university.</p>
+
+      <form id="login-form" class="form">
+        <div class="field">
+          <label for="university-url" data-text="universityUrl">University Platonus URL</label>
+          <input id="university-url" type="url" required maxlength="2048" placeholder="https://platonus.example.edu"
+            inputmode="url" spellcheck="false" autocomplete="url" autocapitalize="off">
+        </div>
+        <div class="field">
+          <label for="username" data-text="username">Username</label>
+          <input id="username" type="text" autocomplete="username" required maxlength="256"
+            spellcheck="false" autocapitalize="off">
+        </div>
+        <div id="identity-field" class="field" hidden>
+          <label for="identity" data-text="identity">Individual identification number (IIN)</label>
+          <input id="identity" type="text" autocomplete="off" inputmode="numeric" maxlength="12"
+            pattern="[0-9]{12}">
+        </div>
+        <div class="field">
+          <label for="password" data-text="password">Password</label>
+          <input id="password" type="password" autocomplete="current-password" required maxlength="1024">
+        </div>
+        <button class="button primary" id="login-button" type="submit">
+          <span data-text="signIn">Sign in</span>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg>
+        </button>
+      </form>
+    </section>
+
+    <section id="attendance-section" aria-labelledby="student-name" hidden>
+      <div class="account">
+        <div>
+          <p class="overline" data-text="signedInAs">Signed in as</p>
+          <h1 id="student-name" tabindex="-1"></h1>
+        </div>
+        <button type="button" id="logout-button" class="button secondary">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h6m3-12 4 4-4 4m-5-4h9"/></svg>
+          <span data-text="signOut">Sign out</span>
+        </button>
+      </div>
+
+      <div class="attendance">
+        <h2 data-text="qrTitle">Attendance QR</h2>
+        <p class="section-note" data-text="qrHelp">Choose a photo or scan the QR code with your camera.</p>
+        <div class="actions">
+          <button type="button" class="button secondary" id="image-button">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4m-4 4 4-4 4 4M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg>
+            <span data-text="upload">Upload image</span>
+          </button>
+          <input id="image" type="file" accept="image/png,image/jpeg,image/webp,image/bmp" hidden>
+          <button type="button" class="button secondary" id="camera-button">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="m8 6 1.5-2h5L16 6"/><circle cx="12" cy="13" r="3"/></svg>
+            <span data-text="camera">Open camera</span>
+          </button>
+        </div>
+
+        <div id="camera-panel" class="camera-panel" hidden>
+          <div class="video-wrap">
+            <video id="video" playsinline muted></video>
+            <span class="scan-frame" aria-hidden="true"></span>
+          </div>
+          <div class="camera-caption">
+            <p data-text="cameraHelp">Position the QR code inside the frame.</p>
+            <button type="button" id="camera-close" class="button secondary" data-text="closeCamera">Close camera</button>
+          </div>
+        </div>
+
+        <div id="qr-summary" class="qr-summary" hidden>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5m-6-8 2 2 4-4"/></svg>
+          <div><strong id="qr-type"></strong><p id="qr-source"></p></div>
+          <button type="button" id="clear-qr" class="text-button" data-text="clear">Clear</button>
+        </div>
+
+        <section id="location-section" class="location-section" aria-labelledby="location-title" hidden>
+          <h2 id="location-title" data-text="locationTitle">Location required</h2>
+          <p class="section-note" data-text="locationHelp">Use your device location or place a pin on the map.</p>
+          <div class="actions">
+            <button type="button" id="device-location" class="button secondary">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>
+              <span data-text="deviceLocation">Use device location</span>
+            </button>
+            <button type="button" id="open-map" class="button secondary" aria-controls="map-panel" aria-expanded="false">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 10c0 5-7 10-7 10s-7-5-7-10a7 7 0 1 1 14 0z"/><circle cx="12" cy="10" r="2.5"/></svg>
+              <span data-text="mapLocation">Pick on map</span>
+            </button>
+          </div>
+          <p id="coordinates" class="coordinates" aria-live="polite" hidden></p>
+          <div id="map-panel" class="map-panel" hidden>
+            <p class="map-help" data-text="mapHelp">Drag to move the map. Click to place a pin.</p>
+            <div class="map-wrap">
+              <div class="map" id="map" tabindex="0" role="region" aria-label="Location map" data-label="mapLabel">
+                <div class="map-tiles" id="map-tiles" aria-hidden="true"></div>
+                <div class="map-pin" id="map-pin" aria-hidden="true" hidden>
+                  <svg viewBox="0 0 24 24"><path d="M19 9c0 5-7 12-7 12S5 14 5 9a7 7 0 1 1 14 0z"/><circle cx="12" cy="9" r="2.5"/></svg>
+                </div>
+              </div>
+              <div class="map-controls">
+                <button type="button" id="zoom-in" data-label="zoomIn" aria-label="Zoom in">+</button>
+                <button type="button" id="zoom-out" data-label="zoomOut" aria-label="Zoom out">−</button>
+              </div>
+              <div class="map-attribution">
+                © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>
+                <span data-text="mapContributors">contributors</span>
+              </div>
+            </div>
+            <p id="map-error" class="map-help" data-text="mapUnavailable" hidden>Map tiles are unavailable. You can still use your device location.</p>
+            <p class="map-help" data-text="mapKeyboard">Keyboard: arrows to move, +/− to zoom, Enter to place a pin at the center.</p>
+          </div>
+        </section>
+
+        <div class="submit-row">
+          <button type="button" class="button primary" id="submit-button" disabled>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>
+            <span data-text="submit">Mark attendance</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <div id="status" class="status" role="status" aria-live="polite" hidden></div>
+    <details class="diagnostics" id="diagnostics" hidden>
+      <summary data-text="diagnostics">Diagnostic log</summary>
+      <pre id="diagnostics-output" tabindex="0" data-label="diagnostics" aria-label="Diagnostic log"></pre>
+    </details>
+    <noscript><p>JavaScript is required for the local interface.</p></noscript>
+  </main>
+</body>
+</html>
